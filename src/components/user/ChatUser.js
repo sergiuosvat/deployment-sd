@@ -8,14 +8,12 @@ import {CheckCircle, CheckCircleOutline} from "@mui/icons-material";
 const ChatUser = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
     const stompClientRef = useRef(null);
     const [typing, setTyping] = useState(false);
     const userId = sessionStorage.getItem("id");
     const storage_key = "chat_" + userId;
 
     useEffect(() => {
-        let typingTimeout;
         const storedMessages = JSON.parse(localStorage.getItem(storage_key)) || [];
         setMessages(storedMessages);
         setMessages((storedMessages) => {
@@ -100,12 +98,10 @@ const ChatUser = () => {
 
     const handleFocus = () => {
         sendTypingNotification(true);
-        setIsTyping(true);
     };
 
     const handleBlur = () => {
         sendTypingNotification(false);
-        setIsTyping(false);
     };
 
     const handleMessageSubmit = () => {
