@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: Build the app
-        run: npm build
+        run: npm run build
 
       - name: Zip artifact for deployment
         run: zip -r release.zip ./*
