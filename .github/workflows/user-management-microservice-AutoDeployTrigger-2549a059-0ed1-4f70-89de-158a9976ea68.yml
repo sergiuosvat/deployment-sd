@@ -1,8 +1,6 @@
 name: Trigger auto deployment for user-management-microservice
 
-# When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
   push:
     branches: 
       [ user-management ]
@@ -10,15 +8,14 @@ on:
     - '**'
     - '.github/workflows/user-management-microservice-AutoDeployTrigger-2549a059-0ed1-4f70-89de-158a9976ea68.yml'
 
-  # Allow manual trigger 
   workflow_dispatch:      
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions: 
-      id-token: write #This is required for requesting the OIDC JWT Token
-      contents: read #Required when GH token is used to authenticate with private repo
+      id-token: write 
+      contents: read 
 
     steps:
       - name: Checkout to the branch
