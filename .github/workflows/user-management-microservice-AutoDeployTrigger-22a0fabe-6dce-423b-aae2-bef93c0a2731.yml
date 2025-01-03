@@ -21,12 +21,12 @@ jobs:
       - name: Checkout to the branch
         uses: actions/checkout@v2
 
-      - name: Azure Login
-        uses: azure/login@v1
+      - name: Login to Azure
+        uses: azure/login@v2
         with:
-          client-id: ${{ secrets.USERMANAGEMENTMICROSERVICE_AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.USERMANAGEMENTMICROSERVICE_AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.USERMANAGEMENTMICROSERVICE_AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3935FC418F3048129D93CDE8A15FC2B2 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_91F2FFA4D0694B7086438AE74703DBAF }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC433A5133E2460E8B471B056A195481 }}
 
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v2
