@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: Build the app
-        run: npm run build
+        run: npm build
 
       - name: Zip artifact for deployment
         run: zip -r release.zip ./*
@@ -53,6 +53,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: react-app
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -67,5 +70,5 @@ jobs:
         with:
           app-name: 'sd-sergiu-osvat'
           slot-name: 'Production'
-          package: release.zip
+          package: .
           
