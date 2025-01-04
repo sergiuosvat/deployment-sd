@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - sd-sergiu-osvat
+name: Build and deploy container app to Azure Web App - sd-sergiu-osvat
 
 on:
   push:
@@ -11,64 +11,41 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Delete previous node modules
-        run: rm -rf node_modules
+    - name: Log in to registry
+      uses: docker/login-action@v2
+      with:
+        registry: https://sdsergiu.azurecr.io/
+        username: ${{ secrets.AzureAppService_ContainerUsername_286649b8588e4ac8843de7872abf5808 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_2686121e54ab4d0c806a02144aad2858 }}
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build the app
-        run: npm run build
-
-      - name: Zip artifact for deployment
-        run: zip -r release.zip ./*
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: react-app
-          path: release.zip
+    - name: Build and push container image to registry
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: sdsergiu.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_286649b8588e4ac8843de7872abf5808 }}/frontend:${{ github.sha }}
+        file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: react-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3935FC418F3048129D93CDE8A15FC2B2 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_91F2FFA4D0694B7086438AE74703DBAF }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DC433A5133E2460E8B471B056A195481 }}
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'sd-sergiu-osvat'
-          slot-name: 'Production'
-          package: .
-          
+    - name: Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'sd-sergiu-osvat'
+        slot-name: 'production'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_76fac33ac6a9444ba4d0053f35035487 }}
+        images: 'sdsergiu.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_286649b8588e4ac8843de7872abf5808 }}/frontend:${{ github.sha }}'
