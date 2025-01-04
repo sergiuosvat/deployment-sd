@@ -1,0 +1,48 @@
+name: Trigger auto deployment for management-microservice
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ management-microservice ]
+    paths:
+    - '**'
+    - '.github/workflows/management-microservice-AutoDeployTrigger-d7c0f547-7478-4bb8-a5af-50fd94bdfc86.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.MANAGEMENTMICROSERVICE_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.MANAGEMENTMICROSERVICE_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.MANAGEMENTMICROSERVICE_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}
+          _dockerfilePathKey_: _dockerfilePath_
+          registryUrl: sdsergiu.azurecr.io
+          registryUsername: ${{ secrets.MANAGEMENTMICROSERVICE_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.MANAGEMENTMICROSERVICE_REGISTRY_PASSWORD }}
+          containerAppName: management-microservice
+          resourceGroup: Deployment-SD
+          imageToBuild: sdsergiu.azurecr.io/management-microservice:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
