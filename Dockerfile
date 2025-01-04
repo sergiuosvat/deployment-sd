@@ -4,16 +4,16 @@ COPY ./src/ /root/src
 COPY ./pom.xml /root/
 WORKDIR /root
 RUN mvn package
-RUN java -Djarmode=layertools -jar /root/target/user-management-microservice-0.0.1-SNAPSHOT.jar list
-RUN java -Djarmode=layertools -jar /root/target/user-management-microservice-0.0.1-SNAPSHOT.jar extract
+RUN java -Djarmode=layertools -jar /root/target/device-management-microservice-0.0.1-SNAPSHOT.jar list
+RUN java -Djarmode=layertools -jar /root/target/device-management-microservice-0.0.1-SNAPSHOT.jar extract
 RUN ls -l /root
 
 FROM openjdk:17-jdk-slim
 
 ENV TZ=UTC
-ENV DB_IP=user-management.mysql.database.azure.com
+ENV DB_IP=sd-device-management-osvat-sergiu.mysql.database.azure.com
 ENV DB_PORT=3306
-ENV DB_DBNAME=user_db
+ENV DB_DBNAME=device_db
 ENV DB_USER=Sergiu27
 ENV DB_PASSWORD=Root1234
 

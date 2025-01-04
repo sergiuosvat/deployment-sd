@@ -1,43 +1,40 @@
-package user_management_microservice.config;
+package device_management_microservice.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 
 @Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthenticationManager authenticationManager;
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/**", "/register/**", "/error").permitAll()
-                        .requestMatchers("/person/**").authenticated()
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/device/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .authenticationManager(authenticationManager)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(jwtDecoder()))
+                );
+        return http.build();
     }
 
     @Bean
@@ -51,4 +48,9 @@ public class SecurityConfig {
         return source;
     }
 
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        SecretKey key = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+        return NimbusJwtDecoder.withSecretKey(key).build();
+    }
 }
