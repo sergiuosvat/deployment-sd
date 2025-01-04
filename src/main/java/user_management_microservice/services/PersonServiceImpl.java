@@ -83,7 +83,7 @@ public class PersonServiceImpl implements PersonService {
             personNotFoundError(id);
         }
 
-        String url = "http://ds-2024-30243-osvat-sergiu-a-2-device-manager-1:8081/deviceapi/device/delete-by-user/" + id;
+        String url = "https://device-management-microservice.proudgrass-626b941a.westeurope.azurecontainerapps.io/deviceapi/device/delete-by-user/" + id;
         ResponseEntity<Long> response = restTemplate.postForEntity(url, null, Long.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
@@ -92,7 +92,7 @@ public class PersonServiceImpl implements PersonService {
                 personRepository.deleteById(id);
             } catch (Exception e) {
                 LOGGER.error("Failed to delete person with id {} from db", id);
-                String url2 = "http://ds-2024-30243-osvat-sergiu-a-2-device-manager-1:8081/deviceapi/device/restore-by-user/" + id;
+                String url2 = "https://device-management-microservice.proudgrass-626b941a.westeurope.azurecontainerapps.io/deviceapi/device/restore-by-user/" + id;
                 restTemplate.postForEntity(url2, null, Long.class);
                 return;
             }
