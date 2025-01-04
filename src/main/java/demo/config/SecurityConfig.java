@@ -1,4 +1,4 @@
-package device_management_microservice.config;
+package demo.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +19,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${jwt.secret}")
+    @Value("${security.jwt.secret}")
     private String secretKey;
 
     @Bean
@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/device/**").authenticated()
+                        .requestMatchers("/device/**", "/alert-websocket/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
