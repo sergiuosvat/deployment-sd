@@ -1,0 +1,48 @@
+name: Trigger auto deployment for chat-microservice
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ chat-microservice ]
+    paths:
+    - '**'
+    - '.github/workflows/chat-microservice-AutoDeployTrigger-bd9e6f86-e12c-44a7-9c0a-f8db6170c482.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CHATMICROSERVICE_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CHATMICROSERVICE_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CHATMICROSERVICE_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}
+          _dockerfilePathKey_: _dockerfilePath_
+          registryUrl: sdsergiu.azurecr.io
+          registryUsername: ${{ secrets.CHATMICROSERVICE_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CHATMICROSERVICE_REGISTRY_PASSWORD }}
+          containerAppName: chat-microservice
+          resourceGroup: Deployment-SD
+          imageToBuild: sdsergiu.azurecr.io/chat-microservice:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
