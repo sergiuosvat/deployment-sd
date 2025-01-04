@@ -10,13 +10,6 @@ RUN ls -l /root
 
 FROM openjdk:17-jdk-slim
 
-ENV TZ=UTC
-ENV DB_IP=sd-monitoring-database-osvat-sergiu.mysql.database.azure.com
-ENV DB_PORT=3306
-ENV DB_DBNAME=monitoring_db
-ENV DB_USER=Sergiu27
-ENV DB_PASSWORD=Root1234
-
 COPY --from=builder /root/dependencies/ ./
 COPY --from=builder /root/snapshot-dependencies/ ./
 
