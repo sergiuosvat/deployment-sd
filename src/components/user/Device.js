@@ -122,7 +122,9 @@ const Device = () => {
         fetchDevices(currentUserID, userRole);
         fetchUsers();
 
-        const socket = new SockJS("http://localhost/monitoringapi/alert-websocket");
+        const socket = new SockJS(
+          "https://management-microservice.proudgrass-626b941a.westeurope.azurecontainerapps.io/monitoringapi/alert-websocket"
+        );
         const stompClient = Stomp.over(socket);
         console.log("Stomp Client Configuration:", stompClient);
 

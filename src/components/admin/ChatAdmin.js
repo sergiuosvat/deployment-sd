@@ -29,7 +29,9 @@ const ChatAdmin = () => {
             return updatedMessages;
         });
 
-        const socket = new SockJS("http://localhost/chat-api/message-websocket");
+        const socket = new SockJS(
+          "https://chat-microservice.proudgrass-626b941a.westeurope.azurecontainerapps.io/chat-api/message-websocket"
+        );
         const stompClient = Stomp.over(socket);
 
         stompClient.connect({}, () => {

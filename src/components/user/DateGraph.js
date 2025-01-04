@@ -35,9 +35,12 @@ const DateGraph = () => {
 
     const fetchData = async (id, date) => {
         try {
-            const response = await axios.get(`http://localhost/monitoringapi/device/get-all-by-date`, {
-                params: { id, date }
-            });
+            const response = await axios.get(
+              `https://management-microservice.proudgrass-626b941a.westeurope.azurecontainerapps.io/monitoringapi/device/get-all-by-date`,
+              {
+                params: { id, date },
+              }
+            );
 
             const values = response.data;
 
